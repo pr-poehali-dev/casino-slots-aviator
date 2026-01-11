@@ -12,6 +12,12 @@ import Aviator2Game from '@/components/games/Aviator2Game';
 import AviaMasterGame from '@/components/games/AviaMasterGame';
 import MinecraftGame from '@/components/games/MinecraftGame';
 import SportsGame from '@/components/games/SportsGame';
+import FishingGame from '@/components/games/FishingGame';
+import DiceGame from '@/components/games/DiceGame';
+import PokerGame from '@/components/games/PokerGame';
+import DartsGame from '@/components/games/DartsGame';
+import MinesGame from '@/components/games/MinesGame';
+import WheelGame from '@/components/games/WheelGame';
 import ProfileSection from '@/components/ProfileSection';
 import AdminPanel from '@/components/AdminPanel';
 import LiveFeed from '@/components/LiveFeed';
@@ -151,7 +157,7 @@ const Index = () => {
 
       <div className="container mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-4 md:grid-cols-9 w-full mb-6 bg-card/50 p-1 h-auto gap-1">
+          <TabsList className="grid grid-cols-4 md:grid-cols-8 lg:grid-cols-15 w-full mb-6 bg-card/50 p-1 h-auto gap-1">
             <TabsTrigger value="home" className="data-[state=active]:bg-primary text-xs md:text-sm">
               <Icon name="Home" className="w-3 h-3 md:w-4 md:h-4 md:mr-2" />
               <span className="hidden md:inline">Главная</span>
@@ -175,6 +181,30 @@ const Index = () => {
             <TabsTrigger value="sports" className="data-[state=active]:bg-primary text-xs md:text-sm">
               <Icon name="Trophy" className="w-3 h-3 md:w-4 md:h-4 md:mr-2" />
               <span className="hidden md:inline">Спорт</span>
+            </TabsTrigger>
+            <TabsTrigger value="fishing" className="data-[state=active]:bg-primary text-xs md:text-sm">
+              <Icon name="Fish" className="w-3 h-3 md:w-4 md:h-4 md:mr-2" />
+              <span className="hidden md:inline">Рыбалка</span>
+            </TabsTrigger>
+            <TabsTrigger value="dice" className="data-[state=active]:bg-primary text-xs md:text-sm">
+              <span className="text-sm md:text-base">🎲</span>
+              <span className="hidden md:inline ml-1">Кости</span>
+            </TabsTrigger>
+            <TabsTrigger value="poker" className="data-[state=active]:bg-primary text-xs md:text-sm">
+              <span className="text-sm md:text-base">🃏</span>
+              <span className="hidden md:inline ml-1">Покер</span>
+            </TabsTrigger>
+            <TabsTrigger value="darts" className="data-[state=active]:bg-primary text-xs md:text-sm">
+              <Icon name="Target" className="w-3 h-3 md:w-4 md:h-4 md:mr-2" />
+              <span className="hidden md:inline">Дартс</span>
+            </TabsTrigger>
+            <TabsTrigger value="mines" className="data-[state=active]:bg-primary text-xs md:text-sm">
+              <Icon name="Bomb" className="w-3 h-3 md:w-4 md:h-4 md:mr-2" />
+              <span className="hidden md:inline">Сапёр</span>
+            </TabsTrigger>
+            <TabsTrigger value="wheel" className="data-[state=active]:bg-primary text-xs md:text-sm">
+              <Icon name="Circle" className="w-3 h-3 md:w-4 md:h-4 md:mr-2" />
+              <span className="hidden md:inline">Колесо</span>
             </TabsTrigger>
             <TabsTrigger value="profile" className="data-[state=active]:bg-primary text-xs md:text-sm">
               <Icon name="User" className="w-3 h-3 md:w-4 md:h-4 md:mr-2" />
@@ -300,6 +330,78 @@ const Index = () => {
                 <Icon name="Lock" className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
                 <h3 className="text-2xl font-bold mb-2">Игра временно недоступна</h3>
                 <p className="text-muted-foreground">Ставки на спорт отключены администратором</p>
+              </Card>
+            )}
+          </TabsContent>
+
+          <TabsContent value="fishing" className="animate-fade-in">
+            {games.find(g => g.name === 'Рыбалка')?.enabled ? (
+              <FishingGame balance={balance} setBalance={setBalance} />
+            ) : (
+              <Card className="p-12 card-glow text-center">
+                <Icon name="Lock" className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="text-2xl font-bold mb-2">Игра временно недоступна</h3>
+                <p className="text-muted-foreground">Рыбалка отключена администратором</p>
+              </Card>
+            )}
+          </TabsContent>
+
+          <TabsContent value="dice" className="animate-fade-in">
+            {games.find(g => g.name === 'Кости')?.enabled ? (
+              <DiceGame balance={balance} setBalance={setBalance} />
+            ) : (
+              <Card className="p-12 card-glow text-center">
+                <Icon name="Lock" className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="text-2xl font-bold mb-2">Игра временно недоступна</h3>
+                <p className="text-muted-foreground">Кости отключены администратором</p>
+              </Card>
+            )}
+          </TabsContent>
+
+          <TabsContent value="poker" className="animate-fade-in">
+            {games.find(g => g.name === 'Покер')?.enabled ? (
+              <PokerGame balance={balance} setBalance={setBalance} />
+            ) : (
+              <Card className="p-12 card-glow text-center">
+                <Icon name="Lock" className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="text-2xl font-bold mb-2">Игра временно недоступна</h3>
+                <p className="text-muted-foreground">Покер отключён администратором</p>
+              </Card>
+            )}
+          </TabsContent>
+
+          <TabsContent value="darts" className="animate-fade-in">
+            {games.find(g => g.name === 'Дартс')?.enabled ? (
+              <DartsGame balance={balance} setBalance={setBalance} />
+            ) : (
+              <Card className="p-12 card-glow text-center">
+                <Icon name="Lock" className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="text-2xl font-bold mb-2">Игра временно недоступна</h3>
+                <p className="text-muted-foreground">Дартс отключён администратором</p>
+              </Card>
+            )}
+          </TabsContent>
+
+          <TabsContent value="mines" className="animate-fade-in">
+            {games.find(g => g.name === 'Сапёр')?.enabled ? (
+              <MinesGame balance={balance} setBalance={setBalance} />
+            ) : (
+              <Card className="p-12 card-glow text-center">
+                <Icon name="Lock" className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="text-2xl font-bold mb-2">Игра временно недоступна</h3>
+                <p className="text-muted-foreground">Сапёр отключён администратором</p>
+              </Card>
+            )}
+          </TabsContent>
+
+          <TabsContent value="wheel" className="animate-fade-in">
+            {games.find(g => g.name === 'Колесо Фортуны')?.enabled ? (
+              <WheelGame balance={balance} setBalance={setBalance} />
+            ) : (
+              <Card className="p-12 card-glow text-center">
+                <Icon name="Lock" className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="text-2xl font-bold mb-2">Игра временно недоступна</h3>
+                <p className="text-muted-foreground">Колесо Фортуны отключено администратором</p>
               </Card>
             )}
           </TabsContent>

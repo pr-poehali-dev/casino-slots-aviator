@@ -60,6 +60,12 @@ export const useAppStore = create<AppStore>()(
         { id: 13, name: 'Майнкрафт - Кейсы', enabled: true, players: 71 },
         { id: 14, name: 'Спорт - Футбол', enabled: true, players: 92 },
         { id: 15, name: 'Спорт - Хоккей', enabled: true, players: 78 },
+        { id: 16, name: 'Рыбалка', enabled: true, players: 103 },
+        { id: 17, name: 'Кости', enabled: true, players: 87 },
+        { id: 18, name: 'Покер', enabled: true, players: 95 },
+        { id: 19, name: 'Дартс', enabled: true, players: 76 },
+        { id: 20, name: 'Сапёр', enabled: true, players: 112 },
+        { id: 21, name: 'Колесо Фортуны', enabled: true, players: 134 },
       ],
       bonuses: [
         { id: 1, name: 'Приветственный бонус', amount: 500, description: 'Для новых игроков', active: true, type: 'welcome' },
