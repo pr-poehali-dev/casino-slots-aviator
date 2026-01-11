@@ -19,6 +19,14 @@ const MinecraftGame = ({ balance, setBalance }: MinecraftGameProps) => {
   const [towerLevel, setTowerLevel] = useState(0);
   const [towerActive, setTowerActive] = useState(false);
   const [caseOpened, setCaseOpened] = useState(false);
+  
+  const [pickaxeSpinning, setPickaxeSpinning] = useState(false);
+  const [currentPickaxe, setCurrentPickaxe] = useState('⛏️');
+  const [blocks, setBlocks] = useState<{id: number, broken: boolean, hp: number}[]>(
+    Array(9).fill(0).map((_, i) => ({ id: i, broken: false, hp: 3 }))
+  );
+  const [pickaxeScore, setPickaxeScore] = useState(0);
+  const [pickaxeActive, setPickaxeActive] = useState(false);
 
   const startMines = () => {
     if (bet > balance) {
@@ -126,13 +134,189 @@ const MinecraftGame = ({ balance, setBalance }: MinecraftGameProps) => {
     }, 2000);
   };
 
+  const startPickaxeGame = () => {
+    if (bet > balance) {
+      toast.error('Недостаточно средств!');
+      return;
+    }
+    setBalance(prev => prev - bet);
+    setPickaxeActive(true);
+    setPickaxeScore(0);
+    setBlocks(Array(9).fill(0).map((_, i) => ({ id: i, broken: false, hp: 3 })));
+    spinPickaxe();
+  };
+
+  const spinPickaxe = () => {
+    setPickaxeSpinning(true);
+    const pickaxes = ['🪓', '⛏️', '💎'];
+    let spinCount = 0;
+    
+    const spinInterval = setInterval(() => {
+      setCurrentPickaxe(pickaxes[Math.floor(Math.random() * pickaxes.length)]);
+      spinCount++;
+      
+      if (spinCount > 20) {
+        clearInterval(spinInterval);
+        const finalPickaxe = pickaxes[Math.floor(Math.random() * pickaxes.length)];
+        setCurrentPickaxe(finalPickaxe);
+        setPickaxeSpinning(false);
+      }
+    }, 100);
+  };
+
+  const smashBlock = (blockId: number) => {
+    if (!pickaxeActive || pickaxeSpinning) return;
+    
+    const block = blocks.find(b => b.id === blockId);
+    if (!block || block.broken) return;
+
+    let damage = 1;
+    if (currentPickaxe === '⛏️') damage = 2;
+    if (currentPickaxe === '💎') damage = 3;
+
+    const newBlocks = blocks.map(b => {
+      if (b.id === blockId) {
+        const newHp = b.hp - damage;
+        if (newHp <= 0) {
+          const points = currentPickaxe === '🪓' ? 10 : currentPickaxe === '⛏️' ? 25 : 50;
+          setPickaxeScore(prev => prev + points);
+          toast.success(`Блок сломан! +${points} очков`);
+          return { ...b, hp: 0, broken: true };
+        }
+        return { ...b, hp: newHp };
+      }
+      return b;
+    });
+
+    setBlocks(newBlocks);
+    
+    const allBroken = newBlocks.every(b => b.broken);
+    if (allBroken) {
+      const multiplier = 1 + (pickaxeScore / 100);
+      const winAmount = Math.floor(bet * multiplier);
+      setBalance(prev => prev + winAmount);
+      toast.success(`Все блоки разбиты! Выигрыш: ${winAmount}₽`);
+      setPickaxeActive(false);
+    } else {
+      spinPickaxe();
+    }
+  };
+
+  const cashoutPickaxe = () => {
+    if (!pickaxeActive) return;
+    const brokenCount = blocks.filter(b => b.broken).length;
+    const multiplier = 1 + (brokenCount * 0.2);
+    const winAmount = Math.floor(bet * multiplier);
+    setBalance(prev => prev + winAmount);
+    toast.success(`Забрали выигрыш: ${winAmount}₽`);
+    setPickaxeActive(false);
+  };
+
   return (
     <Tabs defaultValue="mines" className="w-full">
-      <TabsList className="grid grid-cols-3 w-full">
+      <TabsList className="grid grid-cols-4 w-full">
         <TabsTrigger value="mines">⛏️ Шахты</TabsTrigger>
+        <TabsTrigger value="pickaxe">⚒️ Кирки</TabsTrigger>
         <TabsTrigger value="tower">🏗️ Башни</TabsTrigger>
         <TabsTrigger value="cases">📦 Кейсы</TabsTrigger>
       </TabsList>
+
+      <TabsContent value="pickaxe">
+        <Card className="p-8 card-glow bg-gradient-to-br from-primary/20 to-secondary/20">
+          <div className="text-center mb-6">
+            <h2 className="text-3xl font-bold mb-2">⚒️ Майнкрафт: Кирки</h2>
+            <p className="text-muted-foreground">Крути кирку, разбивай блоки!</p>
+          </div>
+
+          <div className="max-w-2xl mx-auto mb-8">
+            <div className="flex justify-center mb-6">
+              <div className={`text-9xl ${pickaxeSpinning ? 'animate-spin-slow' : ''}`}>
+                {currentPickaxe}
+              </div>
+            </div>
+
+            <div className="flex justify-center gap-4 mb-6">
+              <div className="text-center p-4 bg-card rounded-lg border-2 border-border">
+                <div className="text-4xl mb-2">🪓</div>
+                <p className="text-sm font-semibold">Деревянная</p>
+                <p className="text-xs text-muted-foreground">Урон: 1, +10 очков</p>
+              </div>
+              <div className="text-center p-4 bg-card rounded-lg border-2 border-primary">
+                <div className="text-4xl mb-2">⛏️</div>
+                <p className="text-sm font-semibold">Железная</p>
+                <p className="text-xs text-muted-foreground">Урон: 2, +25 очков</p>
+              </div>
+              <div className="text-center p-4 bg-card rounded-lg border-2 border-secondary">
+                <div className="text-4xl mb-2">💎</div>
+                <p className="text-sm font-semibold">Алмазная</p>
+                <p className="text-xs text-muted-foreground">Урон: 3, +50 очков</p>
+              </div>
+            </div>
+
+            {pickaxeActive && (
+              <div className="text-center mb-6">
+                <p className="text-3xl font-bold text-secondary">Очки: {pickaxeScore}</p>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Разбито блоков: {blocks.filter(b => b.broken).length} / 9
+                </p>
+              </div>
+            )}
+
+            <div className="grid grid-cols-3 gap-4 mb-6">
+              {blocks.map((block) => (
+                <button
+                  key={block.id}
+                  onClick={() => smashBlock(block.id)}
+                  disabled={!pickaxeActive || pickaxeSpinning || block.broken}
+                  className={`aspect-square text-6xl rounded-lg border-4 transition-all ${
+                    block.broken 
+                      ? 'bg-muted border-muted opacity-30' 
+                      : 'bg-card border-primary hover:border-secondary hover:scale-105 animate-pulse-glow'
+                  } disabled:cursor-not-allowed`}
+                >
+                  {block.broken ? '💨' : (
+                    <div className="relative">
+                      <div className="text-6xl">🟫</div>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="text-lg font-bold text-white bg-black/50 px-2 rounded">
+                          {block.hp}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="max-w-md mx-auto space-y-4">
+            <Input 
+              type="number" 
+              value={bet} 
+              onChange={(e) => setBet(Number(e.target.value))}
+              disabled={pickaxeActive}
+              placeholder="Ставка"
+              min={1}
+              max={balance}
+            />
+            <div className="flex gap-2">
+              {!pickaxeActive ? (
+                <Button onClick={startPickaxeGame} className="premium-gradient w-full h-14 text-lg">
+                  Начать игру
+                </Button>
+              ) : (
+                <Button 
+                  onClick={cashoutPickaxe} 
+                  disabled={blocks.filter(b => b.broken).length === 0}
+                  className="premium-gradient w-full h-14 text-lg"
+                >
+                  Забрать выигрыш {(bet * (1 + blocks.filter(b => b.broken).length * 0.2)).toFixed(0)}₽
+                </Button>
+              )}
+            </div>
+          </div>
+        </Card>
+      </TabsContent>
 
       <TabsContent value="mines">
         <Card className="p-8 card-glow">
