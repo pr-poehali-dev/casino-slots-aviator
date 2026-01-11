@@ -13,13 +13,17 @@ const AdminPanel = () => {
     { id: 2, name: 'Слоты - Рыбка', enabled: true, players: 32 },
     { id: 3, name: 'Слоты - Собачка', enabled: true, players: 28 },
     { id: 4, name: 'Слоты - Фрукты VIP', enabled: true, players: 67 },
-    { id: 5, name: 'Авиатор', enabled: true, players: 124 },
-    { id: 6, name: 'AviaMaster', enabled: true, players: 89 },
-    { id: 7, name: 'Майнкрафт - Шахты', enabled: true, players: 56 },
-    { id: 8, name: 'Майнкрафт - Башни', enabled: true, players: 43 },
-    { id: 9, name: 'Майнкрафт - Кейсы', enabled: true, players: 71 },
-    { id: 10, name: 'Спорт - Футбол', enabled: true, players: 92 },
-    { id: 11, name: 'Спорт - Хоккей', enabled: true, players: 78 },
+    { id: 5, name: 'Слоты - Рыбка VIP', enabled: true, players: 54 },
+    { id: 6, name: 'Слоты - Собачка VIP', enabled: true, players: 61 },
+    { id: 7, name: 'Авиатор', enabled: true, players: 124 },
+    { id: 8, name: 'Авиатор 2', enabled: true, players: 98 },
+    { id: 9, name: 'AviaMaster', enabled: true, players: 89 },
+    { id: 10, name: 'Майнкрафт - Шахты', enabled: true, players: 56 },
+    { id: 11, name: 'Майнкрафт - Кирки', enabled: true, players: 72 },
+    { id: 12, name: 'Майнкрафт - Башни', enabled: true, players: 43 },
+    { id: 13, name: 'Майнкрафт - Кейсы', enabled: true, players: 71 },
+    { id: 14, name: 'Спорт - Футбол', enabled: true, players: 92 },
+    { id: 15, name: 'Спорт - Хоккей', enabled: true, players: 78 },
   ]);
 
   const [users, setUsers] = useState([
@@ -27,6 +31,17 @@ const AdminPanel = () => {
     { id: 2, username: 'Lucky777', balance: 12500, status: 'active' },
     { id: 3, username: 'Winner456', balance: 3200, status: 'active' },
     { id: 4, username: 'Gamer999', balance: 8900, status: 'blocked' },
+  ]);
+
+  const [bonuses, setBonuses] = useState([
+    { id: 1, name: 'Приветственный бонус', amount: 500, description: 'Для новых игроков', active: true, type: 'welcome' },
+    { id: 2, name: 'Кэшбэк 5%', amount: 100, description: 'Еженедельный возврат', active: false, type: 'cashback' },
+    { id: 3, name: '10 фриспинов', amount: 10, description: 'Бесплатные вращения', active: false, type: 'freespins' },
+  ]);
+
+  const [promotions, setPromotions] = useState([
+    { id: 1, title: 'Счастливые часы', description: 'Удвоенные выигрыши 20:00-22:00', active: true, period: 'daily' },
+    { id: 2, title: 'Турнир выходного дня', description: 'Призовой фонд 100,000₽', active: true, period: 'weekend' },
   ]);
 
   const toggleGame = (id: number) => {
@@ -73,7 +88,7 @@ const AdminPanel = () => {
       </Card>
 
       <Tabs defaultValue="games" className="w-full">
-        <TabsList className="grid grid-cols-3 w-full">
+        <TabsList className="grid grid-cols-5 w-full">
           <TabsTrigger value="games">
             <Icon name="Gamepad2" className="w-4 h-4 mr-2" />
             Игры
@@ -81,6 +96,14 @@ const AdminPanel = () => {
           <TabsTrigger value="users">
             <Icon name="Users" className="w-4 h-4 mr-2" />
             Пользователи
+          </TabsTrigger>
+          <TabsTrigger value="bonuses">
+            <Icon name="Gift" className="w-4 h-4 mr-2" />
+            Бонусы
+          </TabsTrigger>
+          <TabsTrigger value="promotions">
+            <Icon name="Sparkles" className="w-4 h-4 mr-2" />
+            Акции
           </TabsTrigger>
           <TabsTrigger value="settings">
             <Icon name="Settings" className="w-4 h-4 mr-2" />
@@ -140,6 +163,191 @@ const AdminPanel = () => {
                     </Button>
                   </div>
                 </div>
+              ))}
+            </div>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="bonuses">
+          <Card className="p-6 card-glow">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold">Управление бонусами</h3>
+              <Button 
+                className="premium-gradient"
+                onClick={() => {
+                  const name = prompt('Название бонуса:');
+                  const amount = prompt('Сумма/количество:');
+                  const desc = prompt('Описание:');
+                  if (name && amount && desc) {
+                    setBonuses([...bonuses, {
+                      id: Date.now(),
+                      name,
+                      amount: Number(amount),
+                      description: desc,
+                      active: true,
+                      type: 'custom'
+                    }]);
+                    toast.success('Бонус добавлен!');
+                  }
+                }}
+              >
+                <Icon name="Plus" className="mr-2" />
+                Добавить бонус
+              </Button>
+            </div>
+            
+            <div className="space-y-3">
+              {bonuses.map(bonus => (
+                <div key={bonus.id} className="p-4 bg-card rounded border border-border">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-4">
+                      <Switch 
+                        checked={bonus.active}
+                        onCheckedChange={() => {
+                          setBonuses(bonuses.map(b => 
+                            b.id === bonus.id ? {...b, active: !b.active} : b
+                          ));
+                          toast.success('Статус бонуса изменён');
+                        }}
+                      />
+                      <div>
+                        <p className="font-bold text-lg">{bonus.name}</p>
+                        <p className="text-sm text-muted-foreground">{bonus.description}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="text-right">
+                        <p className="text-2xl font-bold text-secondary">
+                          {bonus.type === 'freespins' ? bonus.amount : `${bonus.amount}₽`}
+                        </p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          const newAmount = prompt('Новая сумма:', bonus.amount.toString());
+                          if (newAmount) {
+                            setBonuses(bonuses.map(b =>
+                              b.id === bonus.id ? {...b, amount: Number(newAmount)} : b
+                            ));
+                            toast.success('Бонус обновлён');
+                          }
+                        }}
+                      >
+                        <Icon name="Edit" className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setBonuses(bonuses.filter(b => b.id !== bonus.id));
+                          toast.success('Бонус удалён');
+                        }}
+                      >
+                        <Icon name="Trash2" className="w-4 h-4 text-destructive" />
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className={`text-xs px-2 py-1 rounded ${bonus.active ? 'bg-secondary/20 text-secondary' : 'bg-muted text-muted-foreground'}`}>
+                      {bonus.active ? 'Активен' : 'Отключён'}
+                    </span>
+                    <span className="text-xs px-2 py-1 rounded bg-primary/20 text-primary">
+                      {bonus.type === 'welcome' ? 'Приветственный' : 
+                       bonus.type === 'cashback' ? 'Кэшбэк' :
+                       bonus.type === 'freespins' ? 'Фриспины' : 'Особый'}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="promotions">
+          <Card className="p-6 card-glow">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold">Управление акциями</h3>
+              <Button 
+                className="premium-gradient"
+                onClick={() => {
+                  const title = prompt('Название акции:');
+                  const desc = prompt('Описание:');
+                  const period = prompt('Период (daily/weekend/monthly):');
+                  if (title && desc && period) {
+                    setPromotions([...promotions, {
+                      id: Date.now(),
+                      title,
+                      description: desc,
+                      active: true,
+                      period: period as any
+                    }]);
+                    toast.success('Акция добавлена!');
+                  }
+                }}
+              >
+                <Icon name="Plus" className="mr-2" />
+                Добавить акцию
+              </Button>
+            </div>
+
+            <div className="space-y-4">
+              {promotions.map(promo => (
+                <Card key={promo.id} className="p-6 bg-gradient-to-r from-primary/10 to-accent/10">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-4">
+                      <Switch 
+                        checked={promo.active}
+                        onCheckedChange={() => {
+                          setPromotions(promotions.map(p => 
+                            p.id === promo.id ? {...p, active: !p.active} : p
+                          ));
+                          toast.success('Статус акции изменён');
+                        }}
+                      />
+                      <div>
+                        <h4 className="text-xl font-bold mb-1">{promo.title}</h4>
+                        <p className="text-muted-foreground">{promo.description}</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          const newDesc = prompt('Новое описание:', promo.description);
+                          if (newDesc) {
+                            setPromotions(promotions.map(p =>
+                              p.id === promo.id ? {...p, description: newDesc} : p
+                            ));
+                            toast.success('Акция обновлена');
+                          }
+                        }}
+                      >
+                        <Icon name="Edit" className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setPromotions(promotions.filter(p => p.id !== promo.id));
+                          toast.success('Акция удалена');
+                        }}
+                      >
+                        <Icon name="Trash2" className="w-4 h-4 text-destructive" />
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className={`text-xs px-3 py-1 rounded-full ${promo.active ? 'bg-secondary text-secondary-foreground' : 'bg-muted text-muted-foreground'}`}>
+                      {promo.active ? '✓ Активна' : '✕ Отключена'}
+                    </span>
+                    <span className="text-xs px-3 py-1 rounded-full bg-primary text-primary-foreground">
+                      {promo.period === 'daily' ? '📅 Ежедневно' :
+                       promo.period === 'weekend' ? '🎉 Выходные' : '📆 Ежемесячно'}
+                    </span>
+                  </div>
+                </Card>
               ))}
             </div>
           </Card>

@@ -20,7 +20,7 @@ const SlotsGame = ({ balance, setBalance }: SlotsGameProps) => {
   const [spinning, setSpinning] = useState(false);
   const [reels, setReels] = useState(['🍒', '🍒', '🍒']);
   const [vipReels, setVipReels] = useState(['🍒', '🍒', '🍒', '🍒', '🍒']);
-  const [slotType, setSlotType] = useState<'fruits' | 'fish' | 'dogs' | 'vip'>('fruits');
+  const [slotType, setSlotType] = useState<'fruits' | 'fish' | 'dogs' | 'vip' | 'fishvip' | 'dogsvip'>('fruits');
 
   const spin = (isVip: boolean = false) => {
     if (bet > balance) {
@@ -32,8 +32,8 @@ const SlotsGame = ({ balance, setBalance }: SlotsGameProps) => {
     setSpinning(true);
 
     let symbols = fruits;
-    if (slotType === 'fish') symbols = fish;
-    if (slotType === 'dogs') symbols = dogs;
+    if (slotType === 'fish' || slotType === 'fishvip') symbols = fish;
+    if (slotType === 'dogs' || slotType === 'dogsvip') symbols = dogs;
 
     const duration = 2000;
     const interval = setInterval(() => {
@@ -88,11 +88,13 @@ const SlotsGame = ({ balance, setBalance }: SlotsGameProps) => {
   return (
     <div className="space-y-6">
       <Tabs value={slotType} onValueChange={(v) => setSlotType(v as any)} className="w-full">
-        <TabsList className="grid grid-cols-4 w-full">
+        <TabsList className="grid grid-cols-3 md:grid-cols-6 w-full gap-1">
           <TabsTrigger value="fruits">🍒 Фрукты</TabsTrigger>
           <TabsTrigger value="fish">🐟 Рыбка</TabsTrigger>
           <TabsTrigger value="dogs">🐶 Собачка</TabsTrigger>
           <TabsTrigger value="vip">💎 Фрукты VIP</TabsTrigger>
+          <TabsTrigger value="fishvip">🐠 Рыбка VIP</TabsTrigger>
+          <TabsTrigger value="dogsvip">🦴 Собачка VIP</TabsTrigger>
         </TabsList>
 
         {['fruits', 'fish', 'dogs'].map(type => (
@@ -140,12 +142,17 @@ const SlotsGame = ({ balance, setBalance }: SlotsGameProps) => {
           </TabsContent>
         ))}
 
-        <TabsContent value="vip">
-          <Card className="p-8 card-glow bg-gradient-to-br from-secondary/20 to-accent/20">
-            <div className="text-center mb-6">
-              <h2 className="text-3xl font-bold mb-2 gold-glow">💎 Премиум слот - 5 барабанов</h2>
-              <p className="text-muted-foreground">5 одинаковых = ДЖЕКПОТ x100!</p>
-            </div>
+        {['vip', 'fishvip', 'dogsvip'].map(vipType => (
+          <TabsContent key={vipType} value={vipType}>
+            <Card className="p-8 card-glow bg-gradient-to-br from-secondary/20 to-accent/20">
+              <div className="text-center mb-6">
+                <h2 className="text-3xl font-bold mb-2 gold-glow">
+                  {vipType === 'vip' && '💎 Фрукты VIP - 5 барабанов'}
+                  {vipType === 'fishvip' && '🐠 Рыбка VIP - 5 барабанов'}
+                  {vipType === 'dogsvip' && '🦴 Собачка VIP - 5 барабанов'}
+                </h2>
+                <p className="text-muted-foreground">5 одинаковых = ДЖЕКПОТ x100!</p>
+              </div>
 
             <div className="flex justify-center gap-2 mb-8">
               {vipReels.map((symbol, i) => (
@@ -178,6 +185,7 @@ const SlotsGame = ({ balance, setBalance }: SlotsGameProps) => {
             </div>
           </Card>
         </TabsContent>
+        ))}
       </Tabs>
     </div>
   );

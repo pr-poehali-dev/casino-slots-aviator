@@ -7,6 +7,7 @@ import Icon from '@/components/ui/icon';
 import { toast } from 'sonner';
 import SlotsGame from '@/components/games/SlotsGame';
 import AviatorGame from '@/components/games/AviatorGame';
+import Aviator2Game from '@/components/games/Aviator2Game';
 import AviaMasterGame from '@/components/games/AviaMasterGame';
 import MinecraftGame from '@/components/games/MinecraftGame';
 import SportsGame from '@/components/games/SportsGame';
@@ -147,39 +148,43 @@ const Index = () => {
 
       <div className="container mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-8 w-full mb-6 bg-card/50 p-1 h-auto">
-            <TabsTrigger value="home" className="data-[state=active]:bg-primary">
-              <Icon name="Home" className="w-4 h-4 mr-2" />
-              Главная
+          <TabsList className="grid grid-cols-4 md:grid-cols-9 w-full mb-6 bg-card/50 p-1 h-auto gap-1">
+            <TabsTrigger value="home" className="data-[state=active]:bg-primary text-xs md:text-sm">
+              <Icon name="Home" className="w-3 h-3 md:w-4 md:h-4 md:mr-2" />
+              <span className="hidden md:inline">Главная</span>
             </TabsTrigger>
-            <TabsTrigger value="slots" className="data-[state=active]:bg-primary">
-              <Icon name="Cherry" className="w-4 h-4 mr-2" />
-              Слоты
+            <TabsTrigger value="slots" className="data-[state=active]:bg-primary text-xs md:text-sm">
+              <Icon name="Cherry" className="w-3 h-3 md:w-4 md:h-4 md:mr-2" />
+              <span className="hidden md:inline">Слоты</span>
             </TabsTrigger>
-            <TabsTrigger value="aviator" className="data-[state=active]:bg-primary">
-              <Icon name="Plane" className="w-4 h-4 mr-2" />
-              Авиатор
+            <TabsTrigger value="aviator" className="data-[state=active]:bg-primary text-xs md:text-sm">
+              <Icon name="Plane" className="w-3 h-3 md:w-4 md:h-4 md:mr-2" />
+              <span className="hidden md:inline">Авиатор</span>
             </TabsTrigger>
-            <TabsTrigger value="minecraft" className="data-[state=active]:bg-primary">
-              <Icon name="Package" className="w-4 h-4 mr-2" />
-              Майнкрафт
+            <TabsTrigger value="aviator2" className="data-[state=active]:bg-primary text-xs md:text-sm">
+              <Icon name="Rocket" className="w-3 h-3 md:w-4 md:h-4 md:mr-2" />
+              <span className="hidden md:inline">Авиатор 2</span>
             </TabsTrigger>
-            <TabsTrigger value="sports" className="data-[state=active]:bg-primary">
-              <Icon name="Trophy" className="w-4 h-4 mr-2" />
-              Спорт
+            <TabsTrigger value="minecraft" className="data-[state=active]:bg-primary text-xs md:text-sm">
+              <Icon name="Package" className="w-3 h-3 md:w-4 md:h-4 md:mr-2" />
+              <span className="hidden md:inline">Майнкрафт</span>
             </TabsTrigger>
-            <TabsTrigger value="profile" className="data-[state=active]:bg-primary">
-              <Icon name="User" className="w-4 h-4 mr-2" />
-              Кабинет
+            <TabsTrigger value="sports" className="data-[state=active]:bg-primary text-xs md:text-sm">
+              <Icon name="Trophy" className="w-3 h-3 md:w-4 md:h-4 md:mr-2" />
+              <span className="hidden md:inline">Спорт</span>
             </TabsTrigger>
-            <TabsTrigger value="bonuses" className="data-[state=active]:bg-primary">
-              <Icon name="Gift" className="w-4 h-4 mr-2" />
-              Бонусы
+            <TabsTrigger value="profile" className="data-[state=active]:bg-primary text-xs md:text-sm">
+              <Icon name="User" className="w-3 h-3 md:w-4 md:h-4 md:mr-2" />
+              <span className="hidden md:inline">Кабинет</span>
+            </TabsTrigger>
+            <TabsTrigger value="bonuses" className="data-[state=active]:bg-primary text-xs md:text-sm">
+              <Icon name="Gift" className="w-3 h-3 md:w-4 md:h-4 md:mr-2" />
+              <span className="hidden md:inline">Бонусы</span>
             </TabsTrigger>
             {isAdmin && (
-              <TabsTrigger value="admin" className="data-[state=active]:bg-accent">
-                <Icon name="Settings" className="w-4 h-4 mr-2" />
-                Админ
+              <TabsTrigger value="admin" className="data-[state=active]:bg-accent text-xs md:text-sm">
+                <Icon name="Settings" className="w-3 h-3 md:w-4 md:h-4 md:mr-2" />
+                <span className="hidden md:inline">Админ</span>
               </TabsTrigger>
             )}
           </TabsList>
@@ -242,6 +247,10 @@ const Index = () => {
 
           <TabsContent value="aviator" className="animate-fade-in">
             <AviatorGame balance={balance} setBalance={setBalance} />
+          </TabsContent>
+
+          <TabsContent value="aviator2" className="animate-fade-in">
+            <Aviator2Game balance={balance} setBalance={setBalance} />
           </TabsContent>
 
           <TabsContent value="minecraft" className="animate-fade-in">
