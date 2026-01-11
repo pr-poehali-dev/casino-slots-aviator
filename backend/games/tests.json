@@ -1,0 +1,32 @@
+{
+  "tests": [
+    {
+      "name": "Get game settings",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "settings": []
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Play game",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "action": "play",
+        "user_id": 1,
+        "game_name": "Слоты",
+        "bet_amount": 100
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true,
+        "win_amount": "number",
+        "balance": "number"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
