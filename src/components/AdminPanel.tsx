@@ -6,25 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Icon from '@/components/ui/icon';
 import { toast } from 'sonner';
+import { useAppStore } from '@/lib/store';
 
 const AdminPanel = () => {
-  const [games, setGames] = useState([
-    { id: 1, name: 'Слоты - Фрукты', enabled: true, players: 45 },
-    { id: 2, name: 'Слоты - Рыбка', enabled: true, players: 32 },
-    { id: 3, name: 'Слоты - Собачка', enabled: true, players: 28 },
-    { id: 4, name: 'Слоты - Фрукты VIP', enabled: true, players: 67 },
-    { id: 5, name: 'Слоты - Рыбка VIP', enabled: true, players: 54 },
-    { id: 6, name: 'Слоты - Собачка VIP', enabled: true, players: 61 },
-    { id: 7, name: 'Авиатор', enabled: true, players: 124 },
-    { id: 8, name: 'Авиатор 2', enabled: true, players: 98 },
-    { id: 9, name: 'AviaMaster', enabled: true, players: 89 },
-    { id: 10, name: 'Майнкрафт - Шахты', enabled: true, players: 56 },
-    { id: 11, name: 'Майнкрафт - Кирки', enabled: true, players: 72 },
-    { id: 12, name: 'Майнкрафт - Башни', enabled: true, players: 43 },
-    { id: 13, name: 'Майнкрафт - Кейсы', enabled: true, players: 71 },
-    { id: 14, name: 'Спорт - Футбол', enabled: true, players: 92 },
-    { id: 15, name: 'Спорт - Хоккей', enabled: true, players: 78 },
-  ]);
+  const { games, bonuses, promotions, toggleGame, addBonus, updateBonus, deleteBonus, toggleBonus, addPromotion, updatePromotion, deletePromotion, togglePromotion } = useAppStore();
 
   const [users, setUsers] = useState([
     { id: 1, username: 'Player123', balance: 5000, status: 'active' },
@@ -33,21 +18,8 @@ const AdminPanel = () => {
     { id: 4, username: 'Gamer999', balance: 8900, status: 'blocked' },
   ]);
 
-  const [bonuses, setBonuses] = useState([
-    { id: 1, name: 'Приветственный бонус', amount: 500, description: 'Для новых игроков', active: true, type: 'welcome' },
-    { id: 2, name: 'Кэшбэк 5%', amount: 100, description: 'Еженедельный возврат', active: false, type: 'cashback' },
-    { id: 3, name: '10 фриспинов', amount: 10, description: 'Бесплатные вращения', active: false, type: 'freespins' },
-  ]);
-
-  const [promotions, setPromotions] = useState([
-    { id: 1, title: 'Счастливые часы', description: 'Удвоенные выигрыши 20:00-22:00', active: true, period: 'daily' },
-    { id: 2, title: 'Турнир выходного дня', description: 'Призовой фонд 100,000₽', active: true, period: 'weekend' },
-  ]);
-
-  const toggleGame = (id: number) => {
-    setGames(games.map(game => 
-      game.id === id ? { ...game, enabled: !game.enabled } : game
-    ));
+  const handleToggleGame = (id: number) => {
+    toggleGame(id);
     toast.success('Статус игры изменён');
   };
 
@@ -120,7 +92,7 @@ const AdminPanel = () => {
                   <div className="flex items-center gap-4">
                     <Switch 
                       checked={game.enabled}
-                      onCheckedChange={() => toggleGame(game.id)}
+                      onCheckedChange={() => handleToggleGame(game.id)}
                     />
                     <div>
                       <p className="font-semibold">{game.name}</p>
@@ -179,14 +151,13 @@ const AdminPanel = () => {
                   const amount = prompt('Сумма/количество:');
                   const desc = prompt('Описание:');
                   if (name && amount && desc) {
-                    setBonuses([...bonuses, {
-                      id: Date.now(),
+                    addBonus({
                       name,
                       amount: Number(amount),
                       description: desc,
                       active: true,
                       type: 'custom'
-                    }]);
+                    });
                     toast.success('Бонус добавлен!');
                   }
                 }}
@@ -204,9 +175,7 @@ const AdminPanel = () => {
                       <Switch 
                         checked={bonus.active}
                         onCheckedChange={() => {
-                          setBonuses(bonuses.map(b => 
-                            b.id === bonus.id ? {...b, active: !b.active} : b
-                          ));
+                          toggleBonus(bonus.id);
                           toast.success('Статус бонуса изменён');
                         }}
                       />
@@ -227,9 +196,7 @@ const AdminPanel = () => {
                         onClick={() => {
                           const newAmount = prompt('Новая сумма:', bonus.amount.toString());
                           if (newAmount) {
-                            setBonuses(bonuses.map(b =>
-                              b.id === bonus.id ? {...b, amount: Number(newAmount)} : b
-                            ));
+                            updateBonus(bonus.id, { amount: Number(newAmount) });
                             toast.success('Бонус обновлён');
                           }
                         }}
@@ -240,7 +207,7 @@ const AdminPanel = () => {
                         variant="ghost"
                         size="sm"
                         onClick={() => {
-                          setBonuses(bonuses.filter(b => b.id !== bonus.id));
+                          deleteBonus(bonus.id);
                           toast.success('Бонус удалён');
                         }}
                       >
@@ -275,13 +242,12 @@ const AdminPanel = () => {
                   const desc = prompt('Описание:');
                   const period = prompt('Период (daily/weekend/monthly):');
                   if (title && desc && period) {
-                    setPromotions([...promotions, {
-                      id: Date.now(),
+                    addPromotion({
                       title,
                       description: desc,
                       active: true,
                       period: period as any
-                    }]);
+                    });
                     toast.success('Акция добавлена!');
                   }
                 }}
@@ -299,9 +265,7 @@ const AdminPanel = () => {
                       <Switch 
                         checked={promo.active}
                         onCheckedChange={() => {
-                          setPromotions(promotions.map(p => 
-                            p.id === promo.id ? {...p, active: !p.active} : p
-                          ));
+                          togglePromotion(promo.id);
                           toast.success('Статус акции изменён');
                         }}
                       />
@@ -317,9 +281,7 @@ const AdminPanel = () => {
                         onClick={() => {
                           const newDesc = prompt('Новое описание:', promo.description);
                           if (newDesc) {
-                            setPromotions(promotions.map(p =>
-                              p.id === promo.id ? {...p, description: newDesc} : p
-                            ));
+                            updatePromotion(promo.id, { description: newDesc });
                             toast.success('Акция обновлена');
                           }
                         }}
@@ -330,7 +292,7 @@ const AdminPanel = () => {
                         variant="ghost"
                         size="sm"
                         onClick={() => {
-                          setPromotions(promotions.filter(p => p.id !== promo.id));
+                          deletePromotion(promo.id);
                           toast.success('Акция удалена');
                         }}
                       >

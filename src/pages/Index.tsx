@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { toast } from 'sonner';
+import { useAppStore } from '@/lib/store';
 import SlotsGame from '@/components/games/SlotsGame';
 import AviatorGame from '@/components/games/AviatorGame';
 import Aviator2Game from '@/components/games/Aviator2Game';
@@ -16,6 +17,7 @@ import AdminPanel from '@/components/AdminPanel';
 import LiveFeed from '@/components/LiveFeed';
 
 const Index = () => {
+  const { games, bonuses, promotions } = useAppStore();
   const [balance, setBalance] = useState(1000);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
@@ -23,6 +25,7 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [isAdmin, setIsAdmin] = useState(false);
   const [username, setUsername] = useState('');
+  const [claimedBonuses, setClaimedBonuses] = useState<number[]>([]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -242,23 +245,63 @@ const Index = () => {
           </TabsContent>
 
           <TabsContent value="slots" className="animate-fade-in">
-            <SlotsGame balance={balance} setBalance={setBalance} />
+            {games.find(g => g.name.includes('Слоты'))?.enabled ? (
+              <SlotsGame balance={balance} setBalance={setBalance} />
+            ) : (
+              <Card className="p-12 card-glow text-center">
+                <Icon name="Lock" className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="text-2xl font-bold mb-2">Игра временно недоступна</h3>
+                <p className="text-muted-foreground">Слоты отключены администратором</p>
+              </Card>
+            )}
           </TabsContent>
 
           <TabsContent value="aviator" className="animate-fade-in">
-            <AviatorGame balance={balance} setBalance={setBalance} />
+            {games.find(g => g.name === 'Авиатор')?.enabled ? (
+              <AviatorGame balance={balance} setBalance={setBalance} />
+            ) : (
+              <Card className="p-12 card-glow text-center">
+                <Icon name="Lock" className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="text-2xl font-bold mb-2">Игра временно недоступна</h3>
+                <p className="text-muted-foreground">Авиатор отключён администратором</p>
+              </Card>
+            )}
           </TabsContent>
 
           <TabsContent value="aviator2" className="animate-fade-in">
-            <Aviator2Game balance={balance} setBalance={setBalance} />
+            {games.find(g => g.name === 'Авиатор 2')?.enabled ? (
+              <Aviator2Game balance={balance} setBalance={setBalance} />
+            ) : (
+              <Card className="p-12 card-glow text-center">
+                <Icon name="Lock" className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="text-2xl font-bold mb-2">Игра временно недоступна</h3>
+                <p className="text-muted-foreground">Авиатор 2 отключён администратором</p>
+              </Card>
+            )}
           </TabsContent>
 
           <TabsContent value="minecraft" className="animate-fade-in">
-            <MinecraftGame balance={balance} setBalance={setBalance} />
+            {games.find(g => g.name.includes('Майнкрафт'))?.enabled ? (
+              <MinecraftGame balance={balance} setBalance={setBalance} />
+            ) : (
+              <Card className="p-12 card-glow text-center">
+                <Icon name="Lock" className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="text-2xl font-bold mb-2">Игра временно недоступна</h3>
+                <p className="text-muted-foreground">Майнкрафт отключён администратором</p>
+              </Card>
+            )}
           </TabsContent>
 
           <TabsContent value="sports" className="animate-fade-in">
-            <SportsGame balance={balance} setBalance={setBalance} />
+            {games.find(g => g.name.includes('Спорт'))?.enabled ? (
+              <SportsGame balance={balance} setBalance={setBalance} />
+            ) : (
+              <Card className="p-12 card-glow text-center">
+                <Icon name="Lock" className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="text-2xl font-bold mb-2">Игра временно недоступна</h3>
+                <p className="text-muted-foreground">Ставки на спорт отключены администратором</p>
+              </Card>
+            )}
           </TabsContent>
 
           <TabsContent value="profile" className="animate-fade-in">
@@ -268,24 +311,59 @@ const Index = () => {
           <TabsContent value="bonuses" className="animate-fade-in">
             <Card className="p-6 card-glow">
               <h2 className="text-2xl font-bold mb-6">🎁 Бонусы и акции</h2>
+              
+              <div className="space-y-4 mb-8">
+                <h3 className="text-xl font-bold">Активные бонусы</h3>
+                {bonuses.filter(b => b.active).map(bonus => (
+                  <Card key={bonus.id} className="p-6 bg-gradient-to-r from-secondary/20 to-accent/20 border-2 border-secondary">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-xl font-bold">{bonus.name}</h3>
+                        <p className="text-muted-foreground">{bonus.description}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-3xl font-bold text-secondary">
+                          {bonus.type === 'freespins' ? `${bonus.amount} спинов` : `${bonus.amount}₽`}
+                        </p>
+                        <Button 
+                          className="mt-2 premium-gradient" 
+                          disabled={claimedBonuses.includes(bonus.id)}
+                          onClick={() => {
+                            setBalance(prev => prev + bonus.amount);
+                            setClaimedBonuses(prev => [...prev, bonus.id]);
+                            toast.success(`Бонус "${bonus.name}" получен!`);
+                          }}
+                        >
+                          {claimedBonuses.includes(bonus.id) ? 'Получен' : 'Получить'}
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+                {bonuses.filter(b => b.active).length === 0 && (
+                  <p className="text-center text-muted-foreground py-8">Нет активных бонусов</p>
+                )}
+              </div>
+
               <div className="space-y-4">
-                <Card className="p-6 bg-gradient-to-r from-secondary/20 to-accent/20 border-2 border-secondary">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-xl font-bold">Приветственный бонус</h3>
-                      <p className="text-muted-foreground">Для новых игроков</p>
+                <h3 className="text-xl font-bold">Активные акции</h3>
+                {promotions.filter(p => p.active).map(promo => (
+                  <Card key={promo.id} className="p-6 bg-gradient-to-r from-primary/10 to-accent/10">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h4 className="text-xl font-bold mb-2">{promo.title}</h4>
+                        <p className="text-muted-foreground">{promo.description}</p>
+                        <span className="inline-block mt-3 text-xs px-3 py-1 rounded-full bg-primary text-primary-foreground">
+                          {promo.period === 'daily' ? '📅 Ежедневно' :
+                           promo.period === 'weekend' ? '🎉 Выходные' : '📆 Ежемесячно'}
+                        </span>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-3xl font-bold text-secondary">500₽</p>
-                      <Button className="mt-2 premium-gradient" onClick={() => {
-                        setBalance(prev => prev + 500);
-                        toast.success('Бонус получен!');
-                      }}>
-                        Получить
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
+                  </Card>
+                ))}
+                {promotions.filter(p => p.active).length === 0 && (
+                  <p className="text-center text-muted-foreground py-8">Нет активных акций</p>
+                )}
               </div>
             </Card>
           </TabsContent>
